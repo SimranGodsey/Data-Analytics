@@ -1,0 +1,68 @@
+CREATE DATABASE ASSIGNMENT02;
+USE ASSIGNMENT02;
+
+CREATE OR REPLACE TABLE WORLD_POPULATION
+(
+ country VARCHAR(60),
+ area	VARCHAR(30),
+ birth_rate	VARCHAR(30),
+ death_rate	VARCHAR(30),
+ infant_mortality_rate	VARCHAR(30),
+ internet_users	 VARCHAR(30),
+ life_exp_at_birth	VARCHAR(30),
+ maternal_mortality_rate	VARCHAR(30),
+ net_migration_rate	VARCHAR(30),
+ population	VARCHAR(30),
+ population_growth_rate VARCHAR(30)
+);
+
+
+
+
+//TASK-1
+//. Which country has the highest population?
+
+select * from world_population;
+
+
+select country,POPULATION,
+row_number() over(order by population desc) as Population
+from world_population 
+where population <>'NULL' LIMIT 1;
+
+//TASK-2
+// Which country has the least number of people?
+
+select country,
+row_number() over(order by population) as Population
+from world_population  LIMIT 1 ;
+
+
+//TASK-03
+// Which country is witnessing the highest population growth?
+
+select country,
+dense_rank() over(order by POPULATION_GROWTH_RATE desc) as Population_GROWTH
+from world_population
+where POPULATION_GROWTH_RATE <>'NA' LIMIT 1;
+
+// TASK-04
+//Which country has an extraordinary number for the population?
+
+select country,
+row_number() over(order by population desc) as Population
+from world_population  
+where population <>'NULL' LIMIT 1;
+
+
+//TASK-05
+//Which is the most densely populated country in the world?
+
+select country, (population/area) as population_density
+from world_population
+where population_density IS NOT NULL
+ORDER BY population_density DESC LIMIT 1;
+
+
+
+
