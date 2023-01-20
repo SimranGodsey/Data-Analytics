@@ -1,0 +1,204 @@
+create database assignment01;
+use assignment01;
+
+CREATE OR REPLACE TABLE SHOPPING_HISTORY
+(
+PRODUCT VARCHAR(20),
+QUANTITY INT,
+UNIT_PRICE INT
+) ;
+
+INSERT INTO SHOPPING_HISTORY VALUES('MILK',5,10);
+INSERT INTO SHOPPING_HISTORY VALUES('MILK',5,10);
+INSERT INTO SHOPPING_HISTORY VALUES('BREAD',4,20);
+INSERT INTO SHOPPING_HISTORY VALUES('CURD',1,30);
+INSERT INTO SHOPPING_HISTORY VALUES('BISCUIT',1,40);
+INSERT INTO SHOPPING_HISTORY VALUES('EGG',5,8);
+INSERT INTO SHOPPING_HISTORY VALUES('CHOCOCHIPS',5,10);
+INSERT INTO SHOPPING_HISTORY VALUES('CAKE',1,450);
+INSERT INTO SHOPPING_HISTORY VALUES('CANDLES',5,2);
+INSERT INTO SHOPPING_HISTORY VALUES('COLD_DRINK',5,30);
+
+
+SELECT * FROM SHOPPING_HISTORY;
+
+// TASK -1//
+
+// WRITE A SQL QUERY FOR EACH PRODUCT RETURNS TOTAL AMOUNT OF MONEY SPENT ON IT.ROWS SHOULD BE ORDER IN DESC ORDER BY PRODUCT
+
+SELECT PRODUCT,(QUANTITY * UNIT_PRICE) AS TOTAL_COST 
+FROM SHOPPING_HISTORY
+ORDER BY PRODUCT DESC;
+
+
+//TASK-2//
+//WRITE AN SQL QUERY THAT FINDS ALL CLIENTS WHO TALKED FOR ATLEAST 10 MINUTES IN TOTAL. THE TABLE OF THE RESULTS SHOULD CONTAIN ONE COLUMN:
+//THE NAME OF THE CLIENT(NAME). ROWS SHOULD BE SORTED ALPHABETICALLY.
+
+// NOTE-:TASK-2 QUESTIONS ARE MERGED IN ONE SOLUTION
+
+CREATE OR REPLACE TABLE PHONES
+(
+NAME VARCHAR(20) NOT NULL UNIQUE,
+PHONE_NUMBER INT NOT NULL UNIQUE
+);
+
+INSERT INTO PHONES VALUES('JACK',1234);
+INSERT INTO PHONES VALUES('LENA',3333);
+INSERT INTO PHONES VALUES('MARK',9999);
+INSERT INTO PHONES VALUES('ANNA',7582);
+INSERT INTO PHONES VALUES('SIMRAN',8769);
+INSERT INTO PHONES VALUES('ADDISON',4315);
+INSERT INTO PHONES VALUES('GINNY',9831);
+INSERT INTO PHONES VALUES('KATE',8003);
+
+CREATE OR REPLACE TABLE CALLS
+(
+ID INT NOT NULL UNIQUE,
+CALLER INT NOT NULL UNIQUE,
+CALLEE  INT NOT NULL UNIQUE,
+DURATION INT NOT NULL UNIQUE
+);
+
+INSERT INTO CALLS VALUES(25,1234,7582,8);
+INSERT INTO CALLS VALUES(7,9999,7582,1);
+INSERT INTO CALLS VALUES(18,9999,3333,4);
+INSERT INTO CALLS VALUES(2,7582,3333,3);
+INSERT INTO CALLS VALUES(3,3333,1234,1);
+INSERT INTO CALLS VALUES(21,3333,1234,1);
+INSERT INTO CALLS VALUES(65,8003,9831,7);
+INSERT INTO CALLS VALUES(100,9831,8003,3);
+INSERT INTO CALLS VALUES(145,4315,9831,18);
+INSERT INTO CALLS VALUES(09,8769,7582,10);
+
+
+SELECT * FROM CALLS;
+SELECT * FROM PHONES;
+
+
+
+with call_details as
+(select caller as phn, sum(duration) as duration
+from calls
+group by caller
+union
+select callee as phn, sum(duration) as duration
+from calls
+group by callee)
+
+select p.name
+from phones p
+join call_details cd on p.PHONE_NUMBER = cd.phn
+group by name
+having sum(duration) >=10;
+
+//TASK-3 
+//WRITE AN SQL QUERY THAT RETURNS TABLE CONTAINING ONE COLUMN, BALANCE.
+//THE TABLE SHOULD CONTAIN ONE ROW WITH THE TOTAL BALANCE OF YOUR ACCOUNT,AT THE END OF THE YEAR, INCLUDING THE FEE FOR HOLDING A CREDIT CARD.
+
+
+CREATE OR REPLACE TABLE TRANSACTIONS
+(
+ AMOUNT INT NOT NULL,
+ DATE DATE
+);
+
+INSERT INTO TRANSACTIONS VALUES(1000,'2020-01-06'); 
+INSERT INTO TRANSACTIONS VALUES(-10,'2020-01-14');
+INSERT INTO TRANSACTIONS VALUES(-75,'2020-01-20');
+INSERT INTO TRANSACTIONS VALUES(-5,'2020-01-25');
+INSERT INTO TRANSACTIONS VALUES(-4,'2020-01-29');
+INSERT INTO TRANSACTIONS VALUES(2000,'2020-03-10');
+INSERT INTO TRANSACTIONS VALUES(-75,'2020-03-12');
+INSERT INTO TRANSACTIONS VALUES(-20,'2020-03-15');
+INSERT INTO TRANSACTIONS VALUES(40,'2020-03-15');
+INSERT INTO TRANSACTIONS VALUES(-50,'2020-03-17');
+INSERT INTO TRANSACTIONS VALUES(200,'2020-10-10');
+INSERT INTO TRANSACTIONS VALUES(-200,'2020-10-10');
+
+
+SELECT * FROM TRANSACTIONS;
+
+WITH CTE as
+(SELECT sum(amount) as total_amount, month(date) as months,
+ CASE WHEN AMOUNT <=0 THEN 'Credit_card'
+       else 'Incoming_Transfer'
+       end as Transaction_types,
+ count(Transaction_types) as counts
+ from transactions
+ group by months,Transaction_types
+  )
+  
+SELECT SUM(total_amount)-(12- (SELECT COUNT(*) FROM CTE 
+WHERE total_amount <=-100 AND counts >=3))*5 AS Final_BALANCE
+FROM CTE; 
+ 
+ 
+ Create table transactions01 ( 
+amount int not null,
+date date not null) ;
+
+
+
+Insert into transactions01 values (1,'2020-06-29');
+Insert into transactions01 values(35,'2020-02-20');
+Insert into transactions01 values(-50,'2020-02-03');
+Insert into transactions01 values(-1,'2020-02-26');
+Insert into transactions01 values (-200,'2020-08-01');
+Insert into transactions01 values (-44,'2020-02-07');
+Insert into transactions01 values (-5,'2020-02-25');
+Insert into transactions01 values (1,'2020-06-29');
+Insert into transactions01 values (1,'2020-06-29');
+Insert into transactions01 values (-100,'2020-12-29');
+Insert into transactions01 values (-100,'2020-12-30');
+Insert into transactions01 values (-100,'2020-12-31');
+
+Select * from transactions01;
+
+with transaction_details as
+(select sum(amount) as total_amount, month(date) as month_no,
+case when amount <0 then 'Credit-card'
+      else 'Incoming_Transfer'
+      end as transaction_types,
+ count(transaction_types) as counts
+ from transactions01
+group by 2,3)
+
+select sum(total_amount) - (12-(select count(*) from transaction_details where total_amount <=-100 and counts >=3 ))*5
+as Final_balance
+from transaction_details;
+
+
+Create table transactions2 ( 
+amount int not null, 
+date date not null) ;
+
+Insert INTO transactions2 values (6000,'2020-04-03');
+Insert INTO transactions2 values (5000,'2020-04-02');
+Insert INTO transactions2 values (4000,'2020-04-01');
+Insert INTO transactions2 values (3000,'2020-03-01');
+Insert INTO transactions2 values (2000,'2020-02-01');
+Insert INTO transactions2 values (1000,'2020-01-01');
+
+ 
+ 
+ SELECT * FROM transactions2;
+ 
+ 
+ with transaction_details as
+                            (select sum(amount) as total_amount, month(date) as month_no,
+                             case when amount < 0 then'Credit_card'
+                                  else 'incoming-transfer'
+                             end as transactiontypes,
+                             count(transactiontypes) as counts
+                             from transactions2
+                            group by month_no,transactiontypes)
+                            
+ select sum(amount) - (12 -(select count(*) from transaction_details where total_amount < -100 and counts >=3 ))* 5 as Final_balance
+ from transactions2;
+ 
+ 
+ 
+ 
+ 
+  
